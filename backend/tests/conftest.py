@@ -1,3 +1,7 @@
+import os
+
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"  # keep app lifespan off the real DB file
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
