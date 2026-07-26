@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import config
-from app.routers import forms, questions
+from app.routers import forms, public, questions
 
 app = FastAPI(title="Typeform Clone API")
 
@@ -16,6 +16,7 @@ app.add_middleware(
 
 app.include_router(forms.router)
 app.include_router(questions.router)
+app.include_router(public.router)
 
 
 @app.get("/api/health")
