@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #191919;
+  /* Typeform-ish palette */
+  --tf-ink: #191919;
+  --tf-ink-soft: #5e5e5e;
+  --tf-bg-soft: #fafafa;
+  --tf-accent: #0445af;
+  --tf-accent-soft: #e8f0fd;
+  --tf-border: #e5e5e5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--tf-ink);
+  --color-ink-soft: var(--tf-ink-soft);
+  --color-bg-soft: var(--tf-bg-soft);
+  --color-accent: var(--tf-accent);
+  --color-accent-soft: var(--tf-accent-soft);
+  --color-line: var(--tf-border);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Thin scrollbars for the builder panels */
+.slim-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.slim-scroll::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 3px;
+}
