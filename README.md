@@ -14,14 +14,14 @@ Built for the **SDE Fullstack Assignment**.
 | Frontend  | Next.js 16 (App Router), TypeScript (strict), Tailwind CSS 4, TanStack Query, framer-motion, @dnd-kit, sonner |
 | Backend   | Python, FastAPI, SQLAlchemy 2, Pydantic v2 |
 | Database  | SQLite |
-| Hosting   | Vercel (frontend) + Render (backend) |
+| Hosting   | Vercel (frontend) + Railway (backend, persistent volume) |
 
 ## Repository layout
 
 ```
 frontend/   Next.js app (dashboard, builder, respondent flow, results)
 backend/    FastAPI app (REST API, validation, seed data, tests)
-render.yaml Render blueprint for the backend
+            └─ railway.toml — Railway service config (build & start command)
 ```
 
 ## Running locally
@@ -64,13 +64,13 @@ submission with every validation rule, results/summary stats, and seeding.
 
 ```
 ┌──────────────────────┐         HTTPS (JSON)         ┌─────────────────────┐
-│  Next.js on Vercel   │  ──────────────────────────▶ │  FastAPI on Render  │
+│  Next.js on Vercel   │  ──────────────────────────▶ │ FastAPI on Railway  │
 │  (client components) │   fetch via NEXT_PUBLIC_API  │  CORS-restricted    │
 └──────────────────────┘                              └──────────┬──────────┘
    dashboard  /                                                  │ SQLAlchemy
    builder    /forms/[id]/edit                        ┌──────────▼──────────┐
-   results    /forms/[id]/results                     │       SQLite        │
-   fill       /f/[publicId]   (public, no auth)       │  (seeded on boot)   │
+   results    /forms/[id]/results                     │  SQLite on volume   │
+   fill       /f/[publicId]   (public, no auth)       │  (seeded if empty)  │
 └─────────────────────────────────────────────────────┴─────────────────────┘
 ```
 
@@ -162,33 +162,45 @@ range (1..max), option membership for choice/dropdown, Yes/No for yes-no.
 
 ## Deployment
 
-**Backend → Render** (free tier):
+**Backend → Railway:**
 
 1. Push the repo to GitHub.
-2. In Render: *New → Blueprint*, pick the repo — it reads `render.yaml`.
-3. After the first deploy, set `CORS_ORIGINS` to your Vercel URL
-   (e.g. `https://your-app.vercel.app,http://localhost:3000`).
+2. In Railway: *New Project → Deploy from GitHub repo*, pick the repo.
+3. In the service **Settings → Source**, set **Root Directory** to `backend`
+   (Railway then picks up `backend/railway.toml` for the start command).
+4. Attach a **Volume** to the service with mount path `/app/data`
+   (right-click the service → *Attach Volume*). This makes the SQLite file
+   survive redeploys and restarts.
+5. In **Variables**, add:
+   - `DATABASE_URL` = `sqlite:////app/data/app.db`  (absolute path into the volume)
+   - `CORS_ORIGINS` = `http://localhost:3000` for now — after the frontend is
+     deployed, change it to `https://your-app.vercel.app,http://localhost:3000`
+6. In **Settings → Networking**, click *Generate Domain* to get the public
+   API URL (e.g. `https://typeform-clone-api.up.railway.app`). Verify
+   `https://<your-domain>/api/health` returns `{"status":"ok"}`.
 
 **Frontend → Vercel:**
 
 1. In Vercel: *Add New → Project*, import the repo.
 2. Set **Root Directory** to `frontend/`.
-3. Add env var `NEXT_PUBLIC_API_URL` = your Render URL
-   (e.g. `https://typeform-clone-api.onrender.com`).
+3. Add env var `NEXT_PUBLIC_API_URL` = your Railway URL
+   (e.g. `https://typeform-clone-api.up.railway.app`).
+4. Deploy, then go back to Railway and update `CORS_ORIGINS` with the
+   Vercel URL.
 
 ## Assumptions & notes
 
 - **Auth is intentionally simplified** per the assignment: the app assumes a
   single default logged-in creator. Public form filling needs no account.
-- **Ephemeral disk on Render's free tier:** the SQLite file is recreated on
-  redeploys/restarts. The app re-seeds demo data automatically whenever the
-  database is empty, so the hosted demo is always usable. (A persistent disk
-  or hosted DB would be the production fix.)
+- **SQLite persistence:** on Railway the database lives on a mounted volume,
+  so data survives redeploys and restarts. The app also re-seeds demo data
+  automatically whenever the database is empty (first boot, or any host
+  without a persistent disk), so the demo is always usable.
 - **Question type is immutable** after creation — delete and re-add to change
   a question's type (matches the API's granular design; the builder offers
   duplicate/delete to make this easy).
 - **Placeholders (per assignment):** logic jumps/branching, integrations,
   collaboration, theme customization, and the file-upload question type are
   shown as "Coming soon".
-- Free-tier Render services cold-start after ~15 min idle; the first request
-  may take up to a minute.
+- Railway hobby services may sleep when idle (if Serverless/App Sleeping is
+  enabled); the first request after a quiet period can take a few seconds.
