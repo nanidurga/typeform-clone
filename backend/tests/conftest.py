@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from app import models  # noqa: F401  (register tables on Base.metadata)
 from app.database import Base, get_db
 from app.main import app
 
