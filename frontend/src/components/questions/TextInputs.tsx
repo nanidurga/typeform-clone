@@ -1,5 +1,7 @@
 "use client";
 
+import { keyOf } from "@/lib/keys";
+
 import type { QuestionInputProps } from "./index";
 
 const BASE =
@@ -16,7 +18,7 @@ export function ShortTextInput({ value, onChange, onSubmit, live, question }: Qu
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
+        if (keyOf(e) === "Enter") {
           e.preventDefault();
           onSubmit();
         }
@@ -35,7 +37,7 @@ export function LongTextInput({ value, onChange, onSubmit, live }: QuestionInput
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+          if (keyOf(e) === "Enter" && !e.shiftKey) {
             e.preventDefault();
             onSubmit();
           }
