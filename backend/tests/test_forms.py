@@ -57,6 +57,24 @@ def test_patch_title_status_and_thank_you(client):
     assert res.json()["status"] == "draft"
 
 
+def test_patch_welcome_screen_fields(client):
+    form = _create(client)
+    assert form["welcome_enabled"] is False
+    res = client.patch(
+        f"/api/forms/{form['id']}",
+        json={
+            "welcome_enabled": True,
+            "welcome_title": "Hi there 👋",
+            "welcome_message": "Ready to start?",
+        },
+    )
+    assert res.status_code == 200
+    body = res.json()
+    assert body["welcome_enabled"] is True
+    assert body["welcome_title"] == "Hi there 👋"
+    assert body["welcome_message"] == "Ready to start?"
+
+
 def test_patch_rejects_bad_status(client):
     form = _create(client)
     res = client.patch(f"/api/forms/{form['id']}", json={"status": "archived"})

@@ -11,6 +11,7 @@ import type { FormDetail } from "@/lib/types";
 
 import { ProgressBar } from "./ProgressBar";
 import { ThankYouScreen } from "./ThankYouScreen";
+import { WelcomeScreen } from "./WelcomeScreen";
 
 interface FormFillerProps {
   form: FormDetail;
@@ -18,6 +19,7 @@ interface FormFillerProps {
 
 export function FormFiller({ form }: FormFillerProps) {
   const questions = form.questions;
+  const [started, setStarted] = useState(!form.welcome_enabled);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -114,6 +116,13 @@ export function FormFiller({ form }: FormFillerProps) {
     if (submitted) return;
     const onKey = (e: KeyboardEvent) => {
       const key = keyOf(e);
+      if (!started) {
+        if (key === "Enter" || key === "ArrowDown") {
+          e.preventDefault();
+          setStarted(true);
+        }
+        return;
+      }
       if (key === "Enter" && !e.shiftKey) {
         const target = e.target as HTMLElement | null;
         // text inputs submit via their own Enter handler
@@ -130,10 +139,20 @@ export function FormFiller({ form }: FormFillerProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [advance, goBack, submitted]);
+  }, [advance, goBack, started, submitted]);
 
   if (submitted) {
     return <ThankYouScreen message={form.thank_you_message} />;
+  }
+
+  if (!started) {
+    return (
+      <WelcomeScreen
+        title={form.welcome_title?.trim() || form.title}
+        message={form.welcome_message}
+        onStart={() => setStarted(true)}
+      />
+    );
   }
 
   if (questions.length === 0) {

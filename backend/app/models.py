@@ -18,6 +18,9 @@ class Form(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
     public_id: Mapped[str] = mapped_column(String(20), unique=True, index=True, nullable=False)
     thank_you_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    welcome_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    welcome_title: Mapped[str | None] = mapped_column(Text, nullable=True)
+    welcome_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=_utcnow, onupdate=_utcnow, nullable=False

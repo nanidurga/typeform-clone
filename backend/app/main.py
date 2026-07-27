@@ -10,9 +10,25 @@ from app.routers import forms, public, questions, results
 from app.seed import seed_if_empty
 
 
+def _run_sqlite_migrations() -> None:
+    """create_all only creates missing tables — add new columns to existing DBs."""
+    with engine.begin() as conn:
+        cols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(forms)")}
+        if cols:
+            if "welcome_enabled" not in cols:
+                conn.exec_driver_sql(
+                    "ALTER TABLE forms ADD COLUMN welcome_enabled BOOLEAN NOT NULL DEFAULT 0"
+                )
+            if "welcome_title" not in cols:
+                conn.exec_driver_sql("ALTER TABLE forms ADD COLUMN welcome_title TEXT")
+            if "welcome_message" not in cols:
+                conn.exec_driver_sql("ALTER TABLE forms ADD COLUMN welcome_message TEXT")
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _run_sqlite_migrations()
     db = SessionLocal()
     try:
         seed_if_empty(db)

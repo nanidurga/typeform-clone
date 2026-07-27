@@ -37,7 +37,9 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 On first start the app creates `backend/data/app.db` and seeds it with two
-published demo forms (with responses) and one draft.
+published demo forms (with responses) and one draft. On upgrades, a small
+startup migration adds any new columns to existing SQLite databases
+(`create_all` only creates missing tables).
 
 **Frontend** (Node 20+):
 
@@ -93,6 +95,9 @@ forms
   status             TEXT      -- 'draft' | 'published'
   public_id          TEXT UNIQUE  -- random slug used in the share link /f/{public_id}
   thank_you_message  TEXT NULL
+  welcome_enabled    BOOLEAN      -- show a welcome screen before the first question
+  welcome_title      TEXT NULL    -- falls back to the form title
+  welcome_message    TEXT NULL
   created_at, updated_at DATETIME
 
 questions

@@ -200,11 +200,20 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
   /* ---------- form-level operations ---------- */
 
   const saveFormNow = useCallback(() => {
-    const { title, thank_you_message } = formRef.current;
+    const {
+      title,
+      thank_you_message,
+      welcome_enabled,
+      welcome_title,
+      welcome_message,
+    } = formRef.current;
     void track(
       api.updateForm(formRef.current.id, {
         title,
         thank_you_message,
+        welcome_enabled,
+        welcome_title,
+        welcome_message,
       })
     ).catch(() => toast.error("Couldn't save your changes"));
   }, [track]);
@@ -218,6 +227,15 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
 
   const setThankYou = (thank_you_message: string) => {
     setForm((prev) => ({ ...prev, thank_you_message }));
+    saveFormDebounced();
+  };
+
+  const setWelcome = (patch: {
+    welcome_enabled?: boolean;
+    welcome_title?: string | null;
+    welcome_message?: string | null;
+  }) => {
+    setForm((prev) => ({ ...prev, ...patch }));
     saveFormDebounced();
   };
 
@@ -292,6 +310,12 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
           }}
           thankYouMessage={form.thank_you_message ?? ""}
           onThankYouChange={setThankYou}
+          welcome={{
+            enabled: form.welcome_enabled,
+            title: form.welcome_title ?? "",
+            message: form.welcome_message ?? "",
+          }}
+          onWelcomeChange={setWelcome}
         />
       </div>
     </div>

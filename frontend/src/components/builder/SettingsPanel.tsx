@@ -12,6 +12,12 @@ interface SettingsPanelProps {
   }) => void;
   thankYouMessage: string;
   onThankYouChange: (message: string) => void;
+  welcome: { enabled: boolean; title: string; message: string };
+  onWelcomeChange: (patch: {
+    welcome_enabled?: boolean;
+    welcome_title?: string | null;
+    welcome_message?: string | null;
+  }) => void;
 }
 
 function Toggle({
@@ -89,6 +95,8 @@ export function SettingsPanel({
   onPatchQuestion,
   thankYouMessage,
   onThankYouChange,
+  welcome,
+  onWelcomeChange,
 }: SettingsPanelProps) {
   return (
     <aside className="slim-scroll w-64 shrink-0 overflow-y-auto border-l border-line bg-white xl:w-80">
@@ -157,7 +165,35 @@ export function SettingsPanel({
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">
           Form settings
         </h3>
-        <label className="mb-1 block text-sm text-ink">Thank you message</label>
+
+        <Toggle
+          label="Welcome screen"
+          checked={welcome.enabled}
+          onChange={(v) => onWelcomeChange({ welcome_enabled: v })}
+        />
+        {welcome.enabled && (
+          <div className="mb-4 mt-2 space-y-2 rounded-md border border-line bg-bg-soft p-2.5">
+            <input
+              value={welcome.title}
+              onChange={(e) =>
+                onWelcomeChange({ welcome_title: e.target.value || null })
+              }
+              placeholder="Welcome title (defaults to form name)"
+              className="w-full rounded-md border border-line bg-white px-2 py-1.5 text-sm outline-none focus:border-ink"
+            />
+            <textarea
+              value={welcome.message}
+              onChange={(e) =>
+                onWelcomeChange({ welcome_message: e.target.value || null })
+              }
+              placeholder="Short intro message (optional)"
+              rows={2}
+              className="w-full resize-none rounded-md border border-line bg-white px-2 py-1.5 text-sm outline-none focus:border-ink"
+            />
+          </div>
+        )}
+
+        <label className="mb-1 mt-3 block text-sm text-ink">Thank you message</label>
         <textarea
           value={thankYouMessage}
           onChange={(e) => onThankYouChange(e.target.value)}

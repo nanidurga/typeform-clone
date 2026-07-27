@@ -46,6 +46,9 @@ class FormDetail(BaseModel):
     status: FormStatus
     public_id: str
     thank_you_message: str | None = None
+    welcome_enabled: bool = False
+    welcome_title: str | None = None
+    welcome_message: str | None = None
     created_at: datetime
     updated_at: datetime
     questions: list[QuestionOut] = []
@@ -58,6 +61,7 @@ class FormListItem(BaseModel):
     public_id: str
     response_count: int
     question_count: int
+    created_at: datetime
     updated_at: datetime
 
 
@@ -69,6 +73,9 @@ class FormPatch(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=255)
     status: FormStatus | None = None
     thank_you_message: str | None = None
+    welcome_enabled: bool | None = None
+    welcome_title: str | None = None
+    welcome_message: str | None = None
 
 
 class QuestionCreate(BaseModel):

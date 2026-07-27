@@ -48,6 +48,9 @@ def seed_if_empty(db: Session) -> None:
         status="published",
         public_id=generate_public_id(db),
         thank_you_message="Thanks for helping us improve! 💜",
+        welcome_enabled=True,
+        welcome_title="We'd love your feedback 👋",
+        welcome_message="It takes less than 2 minutes. Ready?",
     )
     feedback.questions = [
         _question("short_text", "First up — what's your name?", 0, required=True),

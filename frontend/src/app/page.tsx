@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { FormCard } from "@/components/dashboard/FormCard";
 import { FormRow } from "@/components/dashboard/FormRow";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -15,6 +16,33 @@ import {
   useUpdateForm,
 } from "@/lib/hooks";
 import type { FormListItem } from "@/lib/types";
+
+type SortKey = "edited" | "created" | "alpha";
+type ViewMode = "list" | "grid";
+
+const SORT_LABELS: Record<SortKey, string> = {
+  edited: "Last edited",
+  created: "Date created",
+  alpha: "Alphabetical",
+};
+
+function sortForms(forms: FormListItem[], sort: SortKey): FormListItem[] {
+  const sorted = [...forms];
+  switch (sort) {
+    case "created":
+      return sorted.sort(
+        (a, b) => +new Date(b.created_at) - +new Date(a.created_at)
+      );
+    case "alpha":
+      return sorted.sort((a, b) =>
+        a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
+      );
+    default:
+      return sorted.sort(
+        (a, b) => +new Date(b.updated_at) - +new Date(a.updated_at)
+      );
+  }
+}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -28,6 +56,31 @@ export default function DashboardPage() {
   const [renaming, setRenaming] = useState<FormListItem | null>(null);
   const [renameTitle, setRenameTitle] = useState("");
   const [deleting, setDeleting] = useState<FormListItem | null>(null);
+
+  const [sort, setSort] = useState<SortKey>("edited");
+  const [view, setView] = useState<ViewMode>("list");
+
+  // restore preferences after mount (localStorage is client-only)
+  useEffect(() => {
+    const savedSort = localStorage.getItem("dashboard.sort") as SortKey | null;
+    const savedView = localStorage.getItem("dashboard.view") as ViewMode | null;
+    if (savedSort && savedSort in SORT_LABELS) setSort(savedSort);
+    if (savedView === "grid" || savedView === "list") setView(savedView);
+  }, []);
+
+  const changeSort = (next: SortKey) => {
+    setSort(next);
+    localStorage.setItem("dashboard.sort", next);
+  };
+  const changeView = (next: ViewMode) => {
+    setView(next);
+    localStorage.setItem("dashboard.view", next);
+  };
+
+  const sortedForms = useMemo(
+    () => (forms ? sortForms(forms, sort) : []),
+    [forms, sort]
+  );
 
   const submitCreate = () => {
     const title = newTitle.trim() || "My new form";
@@ -75,9 +128,43 @@ export default function DashboardPage() {
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-10">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold text-ink">My workspace</h1>
-          <Button onClick={() => setCreateOpen(true)}>+ Create typeform</Button>
+          <div className="ml-auto flex items-center gap-2">
+            <select
+              aria-label="Sort forms"
+              value={sort}
+              onChange={(e) => changeSort(e.target.value as SortKey)}
+              className="h-9 rounded-lg border border-line bg-white px-2.5 text-sm text-ink outline-none focus:border-ink"
+            >
+              {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
+                <option key={key} value={key}>
+                  {SORT_LABELS[key]}
+                </option>
+              ))}
+            </select>
+            <div className="flex rounded-lg border border-line bg-white p-0.5">
+              <button
+                aria-label="List view"
+                onClick={() => changeView("list")}
+                className={`flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors ${
+                  view === "list" ? "bg-ink text-white" : "text-ink-soft hover:text-ink"
+                }`}
+              >
+                ≡
+              </button>
+              <button
+                aria-label="Grid view"
+                onClick={() => changeView("grid")}
+                className={`flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors ${
+                  view === "grid" ? "bg-ink text-white" : "text-ink-soft hover:text-ink"
+                }`}
+              >
+                ⊞
+              </button>
+            </div>
+            <Button onClick={() => setCreateOpen(true)}>+ Create typeform</Button>
+          </div>
         </div>
 
         {isLoading && <Spinner className="py-24" />}
@@ -101,10 +188,26 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {forms && forms.length > 0 && (
+        {forms && forms.length > 0 && view === "list" && (
           <div className="rounded-xl border border-line bg-white shadow-sm">
-            {forms.map((form) => (
+            {sortedForms.map((form) => (
               <FormRow
+                key={form.id}
+                form={form}
+                onRename={(f) => {
+                  setRenaming(f);
+                  setRenameTitle(f.title);
+                }}
+                onDelete={(f) => setDeleting(f)}
+              />
+            ))}
+          </div>
+        )}
+
+        {forms && forms.length > 0 && view === "grid" && (
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {sortedForms.map((form) => (
+              <FormCard
                 key={form.id}
                 form={form}
                 onRename={(f) => {

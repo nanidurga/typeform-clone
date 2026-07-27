@@ -48,6 +48,7 @@ def list_forms(db: Session = Depends(get_db)):
             public_id=form.public_id,
             response_count=response_count,
             question_count=question_count,
+            created_at=form.created_at,
             updated_at=form.updated_at,
         )
         for form, response_count, question_count in rows
@@ -94,6 +95,9 @@ def duplicate_form(form_id: int, db: Session = Depends(get_db)):
         status="draft",
         public_id=generate_public_id(db),
         thank_you_message=source.thank_you_message,
+        welcome_enabled=source.welcome_enabled,
+        welcome_title=source.welcome_title,
+        welcome_message=source.welcome_message,
     )
     for question in source.questions:
         question_copy = Question(

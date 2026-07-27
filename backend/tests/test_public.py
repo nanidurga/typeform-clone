@@ -34,9 +34,17 @@ def _errors(res):
 
 def test_get_public_form(client, published_form):
     public_id = published_form["form"]["public_id"]
+    fid = published_form["form"]["id"]
+    client.patch(
+        f"/api/forms/{fid}",
+        json={"welcome_enabled": True, "welcome_title": "Welcome!"},
+    )
     res = client.get(f"/api/public/forms/{public_id}")
     assert res.status_code == 200
-    assert len(res.json()["questions"]) == 6
+    body = res.json()
+    assert len(body["questions"]) == 6
+    assert body["welcome_enabled"] is True
+    assert body["welcome_title"] == "Welcome!"
 
 
 def test_draft_form_not_public(client):

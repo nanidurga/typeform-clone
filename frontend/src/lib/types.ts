@@ -33,6 +33,9 @@ export interface FormDetail {
   status: FormStatus;
   public_id: string;
   thank_you_message: string | null;
+  welcome_enabled: boolean;
+  welcome_title: string | null;
+  welcome_message: string | null;
   created_at: string;
   updated_at: string;
   questions: Question[];
@@ -45,6 +48,7 @@ export interface FormListItem {
   public_id: string;
   response_count: number;
   question_count: number;
+  created_at: string;
   updated_at: string;
 }
 
@@ -69,6 +73,9 @@ export interface FormPatch {
   title?: string;
   status?: FormStatus;
   thank_you_message?: string | null;
+  welcome_enabled?: boolean;
+  welcome_title?: string | null;
+  welcome_message?: string | null;
 }
 
 export interface AnswerIn {
