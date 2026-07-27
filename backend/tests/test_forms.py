@@ -75,6 +75,21 @@ def test_patch_welcome_screen_fields(client):
     assert body["welcome_message"] == "Ready to start?"
 
 
+def test_patch_theme(client):
+    form = _create(client)
+    assert form["theme"] is None
+    res = client.patch(
+        f"/api/forms/{form['id']}",
+        json={"theme": {"accent": "purple", "background": "lavender", "font": "serif"}},
+    )
+    assert res.status_code == 200
+    assert res.json()["theme"] == {
+        "accent": "purple",
+        "background": "lavender",
+        "font": "serif",
+    }
+
+
 def test_patch_rejects_bad_status(client):
     form = _create(client)
     res = client.patch(f"/api/forms/{form['id']}", json={"status": "archived"})

@@ -7,6 +7,7 @@ import { QuestionScreen } from "@/components/questions/QuestionScreen";
 import { api, SubmissionError } from "@/lib/api";
 import { keyOf } from "@/lib/keys";
 import { validateAnswer } from "@/lib/respondentValidation";
+import { themeStyle } from "@/lib/themes";
 import type { FormDetail } from "@/lib/types";
 
 import { ProgressBar } from "./ProgressBar";
@@ -141,30 +142,46 @@ export function FormFiller({ form }: FormFillerProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [advance, goBack, started, submitted]);
 
+  // the theme wrapper sets --tf-accent/--tf-ink CSS variables, which every
+  // child component already styles itself from
+  const style = themeStyle(form.theme);
+
   if (submitted) {
-    return <ThankYouScreen message={form.thank_you_message} />;
+    return (
+      <div style={style}>
+        <ThankYouScreen message={form.thank_you_message} />
+      </div>
+    );
   }
 
   if (!started) {
     return (
-      <WelcomeScreen
-        title={form.welcome_title?.trim() || form.title}
-        message={form.welcome_message}
-        onStart={() => setStarted(true)}
-      />
+      <div style={style}>
+        <WelcomeScreen
+          title={form.welcome_title?.trim() || form.title}
+          message={form.welcome_message}
+          onStart={() => setStarted(true)}
+        />
+      </div>
     );
   }
 
   if (questions.length === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-ink-soft">
+      <div
+        style={style}
+        className="flex min-h-screen items-center justify-center text-ink-soft"
+      >
         This form has no questions yet.
       </div>
     );
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-white">
+    <div
+      style={style}
+      className="relative flex min-h-screen flex-col overflow-hidden"
+    >
       <ProgressBar percent={percent} />
 
       <div className="flex flex-1 items-center justify-center px-6 py-20 md:px-16">
@@ -217,8 +234,8 @@ export function FormFiller({ form }: FormFillerProps) {
         </div>
       </div>
 
-      <div className="fixed bottom-5 left-5 z-30 text-xs text-neutral-400">
-        Powered by <span className="font-semibold text-ink-soft">Formly</span>
+      <div className="fixed bottom-5 left-5 z-30 text-xs text-ink-soft opacity-60">
+        Powered by <span className="font-semibold">Formly</span>
       </div>
     </div>
   );

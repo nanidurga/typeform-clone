@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { api, publicFormUrl } from "@/lib/api";
 import type {
   FormDetail,
+  FormTheme,
   Question,
   QuestionPatch,
   QuestionType,
@@ -206,6 +207,7 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
       welcome_enabled,
       welcome_title,
       welcome_message,
+      theme,
     } = formRef.current;
     void track(
       api.updateForm(formRef.current.id, {
@@ -214,6 +216,7 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
         welcome_enabled,
         welcome_title,
         welcome_message,
+        theme,
       })
     ).catch(() => toast.error("Couldn't save your changes"));
   }, [track]);
@@ -227,6 +230,11 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
 
   const setThankYou = (thank_you_message: string) => {
     setForm((prev) => ({ ...prev, thank_you_message }));
+    saveFormDebounced();
+  };
+
+  const setTheme = (patch: FormTheme) => {
+    setForm((prev) => ({ ...prev, theme: { ...prev.theme, ...patch } }));
     saveFormDebounced();
   };
 
@@ -290,6 +298,7 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
           question={selected}
           index={selectedIndex}
           total={form.questions.length}
+          theme={form.theme}
           onEditTitle={(title) =>
             selected && patchQuestionLocal(selected.id, { title })
           }
@@ -316,6 +325,8 @@ export function BuilderShell({ initialForm }: BuilderShellProps) {
             message: form.welcome_message ?? "",
           }}
           onWelcomeChange={setWelcome}
+          theme={form.theme}
+          onThemeChange={setTheme}
         />
       </div>
     </div>

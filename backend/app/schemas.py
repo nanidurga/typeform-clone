@@ -49,6 +49,7 @@ class FormDetail(BaseModel):
     welcome_enabled: bool = False
     welcome_title: str | None = None
     welcome_message: str | None = None
+    theme: dict | None = None
     created_at: datetime
     updated_at: datetime
     questions: list[QuestionOut] = []
@@ -76,6 +77,7 @@ class FormPatch(BaseModel):
     welcome_enabled: bool | None = None
     welcome_title: str | None = None
     welcome_message: str | None = None
+    theme: dict | None = None
 
 
 class QuestionCreate(BaseModel):

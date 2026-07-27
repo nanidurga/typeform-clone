@@ -6,8 +6,10 @@ import { useState } from "react";
 
 import { ResponsesTab } from "@/components/results/ResponsesTab";
 import { SummaryTab } from "@/components/results/SummaryTab";
+import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { responsesCsvUrl } from "@/lib/api";
 import { useForm, useResponses, useSummary } from "@/lib/hooks";
 
 export default function ResultsPage() {
@@ -53,18 +55,29 @@ export default function ResultsPage() {
           <h1 className="text-xl font-bold text-ink">
             {responses.total} {responses.total === 1 ? "response" : "responses"}
           </h1>
-          <div className="flex rounded-lg border border-line bg-white p-0.5">
-            {(["summary", "responses"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                  tab === t ? "bg-ink text-white" : "text-ink-soft hover:text-ink"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <a
+              href={responsesCsvUrl(formId)}
+              download
+              className={responses.total === 0 ? "pointer-events-none" : ""}
+            >
+              <Button variant="secondary" disabled={responses.total === 0}>
+                ↓ Export CSV
+              </Button>
+            </a>
+            <div className="flex rounded-lg border border-line bg-white p-0.5">
+              {(["summary", "responses"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
+                    tab === t ? "bg-ink text-white" : "text-ink-soft hover:text-ink"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

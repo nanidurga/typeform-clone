@@ -105,6 +105,10 @@ export const api = {
     request<FormSummary>(`/api/forms/${formId}/summary`),
 };
 
+export function responsesCsvUrl(formId: number): string {
+  return `${API_URL}/api/forms/${formId}/responses/export`;
+}
+
 export function publicFormUrl(publicId: string): string {
   if (typeof window === "undefined") return `/f/${publicId}`;
   return `${window.location.origin}/f/${publicId}`;

@@ -27,6 +27,12 @@ export interface Question {
   options: QuestionOption[];
 }
 
+export interface FormTheme {
+  accent?: string;
+  background?: string;
+  font?: string;
+}
+
 export interface FormDetail {
   id: number;
   title: string;
@@ -36,6 +42,7 @@ export interface FormDetail {
   welcome_enabled: boolean;
   welcome_title: string | null;
   welcome_message: string | null;
+  theme: FormTheme | null;
   created_at: string;
   updated_at: string;
   questions: Question[];
@@ -76,6 +83,7 @@ export interface FormPatch {
   welcome_enabled?: boolean;
   welcome_title?: string | null;
   welcome_message?: string | null;
+  theme?: FormTheme | null;
 }
 
 export interface AnswerIn {

@@ -23,6 +23,8 @@ def _run_sqlite_migrations() -> None:
                 conn.exec_driver_sql("ALTER TABLE forms ADD COLUMN welcome_title TEXT")
             if "welcome_message" not in cols:
                 conn.exec_driver_sql("ALTER TABLE forms ADD COLUMN welcome_message TEXT")
+            if "theme" not in cols:
+                conn.exec_driver_sql("ALTER TABLE forms ADD COLUMN theme JSON")
 
 
 @asynccontextmanager

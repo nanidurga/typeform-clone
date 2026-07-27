@@ -93,6 +93,36 @@ def test_summary_stats(client, form_with_responses):
     assert name["stats"]["latest"] == ["Cara", "Bob", "Alice"]
 
 
+def test_csv_export(client, form_with_responses):
+    f = form_with_responses
+    fid = f["form"]["id"]
+    res = client.get(f"/api/forms/{fid}/responses/export")
+    assert res.status_code == 200
+    assert res.headers["content-type"].startswith("text/csv")
+    assert "attachment" in res.headers["content-disposition"]
+
+    lines = res.text.strip().splitlines()
+    assert len(lines) == 4  # header + 3 responses
+    assert "Name?" in lines[0] and "Submitted At" in lines[0]
+    assert "Alice" in lines[1]
+    assert "Blue" in lines[3]
+
+
+def test_csv_export_escapes_formulas(client):
+    form = client.post("/api/forms", json={"title": "Inject"}).json()
+    q = client.post(
+        f"/api/forms/{form['id']}/questions", json={"type": "short_text"}
+    ).json()
+    client.patch(f"/api/forms/{form['id']}", json={"status": "published"})
+    form = client.get(f"/api/forms/{form['id']}").json()
+    client.post(
+        f"/api/public/forms/{form['public_id']}/responses",
+        json={"answers": [{"question_id": q["id"], "value": "=SUM(A1:A9)"}]},
+    )
+    res = client.get(f"/api/forms/{form['id']}/responses/export")
+    assert "'=SUM(A1:A9)" in res.text
+
+
 def test_results_404s(client):
     assert client.get("/api/forms/999/responses").status_code == 404
     assert client.get("/api/forms/999/summary").status_code == 404

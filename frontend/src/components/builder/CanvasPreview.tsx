@@ -3,12 +3,14 @@
 import { useState } from "react";
 
 import { QuestionScreen } from "@/components/questions/QuestionScreen";
-import type { Question } from "@/lib/types";
+import { themeStyle } from "@/lib/themes";
+import type { FormTheme, Question } from "@/lib/types";
 
 interface CanvasPreviewProps {
   question: Question | null;
   index: number;
   total: number;
+  theme: FormTheme | null;
   onEditTitle: (title: string) => void;
   onEditDescription: (description: string) => void;
 }
@@ -17,6 +19,7 @@ export function CanvasPreview({
   question,
   index,
   total,
+  theme,
   onEditTitle,
   onEditDescription,
 }: CanvasPreviewProps) {
@@ -36,7 +39,10 @@ export function CanvasPreview({
         )}
       </div>
       <div className="flex flex-1 items-center justify-center p-6">
-        <div className="relative flex min-h-[420px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-2xl border border-line bg-white p-10 shadow-sm">
+        <div
+          style={themeStyle(theme)}
+          className="relative flex min-h-[420px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-2xl border border-line p-10 shadow-sm"
+        >
           {question ? (
             <QuestionScreen
               key={question.id}
@@ -50,7 +56,7 @@ export function CanvasPreview({
               onEditDescription={onEditDescription}
             />
           ) : (
-            <p className="text-ink-soft">
+            <p className="text-ink-soft opacity-70">
               Add a question to see the live preview.
             </p>
           )}

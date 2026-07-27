@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export function ThankYouScreen({ message }: { message: string | null }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-6">
+    <div className="flex min-h-screen items-center justify-center px-6">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -18,8 +18,8 @@ export function ThankYouScreen({ message }: { message: string | null }) {
           {message?.trim() || "Thanks for completing this form!"}
         </h1>
         <p className="mt-4 text-ink-soft">Your response has been recorded.</p>
-        <p className="mt-10 text-xs text-neutral-400">
-          Powered by <span className="font-semibold text-ink-soft">Formly</span>
+        <p className="mt-10 text-xs text-ink-soft opacity-60">
+          Powered by <span className="font-semibold">Formly</span>
         </p>
       </motion.div>
     </div>

@@ -7,6 +7,9 @@ per-question summary stats.
 
 Built for the **SDE Fullstack Assignment**.
 
+**Bonus features implemented:** welcome screens, custom themes (accent color,
+background, font), and CSV export of responses.
+
 ## Tech stack
 
 | Layer     | Technology |
@@ -98,6 +101,7 @@ forms
   welcome_enabled    BOOLEAN      -- show a welcome screen before the first question
   welcome_title      TEXT NULL    -- falls back to the form title
   welcome_message    TEXT NULL
+  theme              JSON NULL    -- {"accent","background","font"} preset keys
   created_at, updated_at DATETIME
 
 questions
@@ -152,6 +156,7 @@ All endpoints are JSON under `/api`. Interactive docs at `/docs` (Swagger).
 | DELETE | `/api/questions/{id}` | Delete question (positions compacted) |
 | PUT    | `/api/forms/{id}/questions/order` | Persist drag-and-drop order |
 | GET    | `/api/forms/{id}/responses` | Responses list |
+| GET    | `/api/forms/{id}/responses/export` | Download all responses as CSV |
 | GET    | `/api/responses/{id}` | One response with question titles |
 | GET    | `/api/forms/{id}/summary` | Per-question stats (counts, averages, distributions) |
 
@@ -205,7 +210,10 @@ range (1..max), option membership for choice/dropdown, Yes/No for yes-no.
   a question's type (matches the API's granular design; the builder offers
   duplicate/delete to make this easy).
 - **Placeholders (per assignment):** logic jumps/branching, integrations,
-  collaboration, theme customization, and the file-upload question type are
-  shown as "Coming soon".
+  collaboration, and the file-upload question type are shown as "Coming soon".
+- **Themes** are preset-based (6 accents × 5 backgrounds × 3 fonts) rather than
+  free-form pickers. The respondent UI reads every color from CSS variables, so
+  a single themed wrapper re-skins the whole flow — and the builder's live
+  preview reuses the same components, so it can't drift from the real thing.
 - Railway hobby services may sleep when idle (if Serverless/App Sleeping is
   enabled); the first request after a quiet period can take a few seconds.

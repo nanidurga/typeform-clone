@@ -1,6 +1,7 @@
 "use client";
 
-import type { Question } from "@/lib/types";
+import { ACCENTS, BACKGROUNDS, FONTS } from "@/lib/themes";
+import type { FormTheme, Question } from "@/lib/types";
 
 interface SettingsPanelProps {
   question: Question | null;
@@ -18,6 +19,8 @@ interface SettingsPanelProps {
     welcome_title?: string | null;
     welcome_message?: string | null;
   }) => void;
+  theme: FormTheme | null;
+  onThemeChange: (patch: FormTheme) => void;
 }
 
 function Toggle({
@@ -97,7 +100,12 @@ export function SettingsPanel({
   onThankYouChange,
   welcome,
   onWelcomeChange,
+  theme,
+  onThemeChange,
 }: SettingsPanelProps) {
+  const accent = theme?.accent ?? "blue";
+  const background = theme?.background ?? "white";
+  const font = theme?.font ?? "sans";
   return (
     <aside className="slim-scroll w-64 shrink-0 overflow-y-auto border-l border-line bg-white xl:w-80">
       {question ? (
@@ -202,8 +210,67 @@ export function SettingsPanel({
           className="w-full resize-none rounded-md border border-line px-2 py-1.5 text-sm outline-none focus:border-ink"
         />
 
+        <div className="mt-5 border-t border-line pt-4">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+            Theme
+          </h3>
+
+          <label className="mb-1.5 block text-sm text-ink">Accent color</label>
+          <div className="mb-4 flex flex-wrap gap-2">
+            {Object.entries(ACCENTS).map(([key, value]) => (
+              <button
+                key={key}
+                aria-label={`Accent ${key}`}
+                onClick={() => onThemeChange({ accent: key })}
+                style={{ background: value.main }}
+                className={`h-7 w-7 rounded-full transition-transform hover:scale-110 ${
+                  accent === key
+                    ? "ring-2 ring-ink ring-offset-2"
+                    : "ring-1 ring-black/10"
+                }`}
+              />
+            ))}
+          </div>
+
+          <label className="mb-1.5 block text-sm text-ink">Background</label>
+          <div className="mb-4 grid grid-cols-3 gap-1.5">
+            {Object.entries(BACKGROUNDS).map(([key, value]) => (
+              <button
+                key={key}
+                onClick={() => onThemeChange({ background: key })}
+                style={{ background: value.bg, color: value.ink }}
+                className={`rounded-md border px-2 py-1.5 text-xs transition-colors ${
+                  background === key
+                    ? "border-ink ring-1 ring-ink"
+                    : "border-line hover:border-neutral-400"
+                }`}
+              >
+                {value.label}
+              </button>
+            ))}
+          </div>
+
+          <label className="mb-1.5 block text-sm text-ink">Font</label>
+          <div className="flex gap-1.5">
+            {Object.entries(FONTS).map(([key, value]) => (
+              <button
+                key={key}
+                onClick={() => onThemeChange({ font: key })}
+                style={{ fontFamily: value.family }}
+                className={`flex-1 rounded-md border px-2 py-1.5 text-sm transition-colors ${
+                  font === key
+                    ? "border-ink bg-ink text-white"
+                    : "border-line text-ink hover:bg-bg-soft"
+                }`}
+              >
+                {value.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-4 space-y-2">
-          {["Theme", "Integrations", "Collaboration"].map((label) => (
+          {["Integrations", "Collaboration", "Logic jumps"].map((label) => (
             <div
               key={label}
               className="flex items-center justify-between rounded-md border border-dashed border-neutral-200 px-3 py-2 text-sm text-neutral-400"

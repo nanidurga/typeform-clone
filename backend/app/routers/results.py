@@ -1,4 +1,9 @@
+import csv
+import io
+import re
+
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response as RawResponse
 from sqlalchemy.orm import Session
 
 from app import schemas
@@ -35,6 +40,45 @@ def list_responses(form_id: int, db: Session = Depends(get_db)):
             )
             for response in responses
         ],
+    )
+
+
+def _csv_safe(value: str) -> str:
+    """Neutralize spreadsheet formula injection (=, +, -, @ prefixes)."""
+    if value and value[0] in "=+-@":
+        return "'" + value
+    return value
+
+
+@router.get("/forms/{form_id}/responses/export")
+def export_responses_csv(form_id: int, db: Session = Depends(get_db)):
+    form = get_form_or_404(form_id, db)
+    responses = (
+        db.query(Response)
+        .filter(Response.form_id == form.id)
+        .order_by(Response.submitted_at.asc(), Response.id.asc())
+        .all()
+    )
+    buffer = io.StringIO()
+    writer = csv.writer(buffer, lineterminator="\r\n")
+    writer.writerow(
+        ["Response ID", "Submitted At"]
+        + [q.title or f"Question {q.position + 1}" for q in form.questions]
+    )
+    for response in responses:
+        by_question = {a.question_id: a.value for a in response.answers}
+        writer.writerow(
+            [response.id, response.submitted_at.isoformat()]
+            + [_csv_safe(by_question.get(q.id, "")) for q in form.questions]
+        )
+
+    slug = re.sub(r"[^a-z0-9]+", "-", form.title.lower()).strip("-") or "form"
+    return RawResponse(
+        content=buffer.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{slug}-responses.csv"'
+        },
     )
 
 

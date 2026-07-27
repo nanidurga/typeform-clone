@@ -98,6 +98,7 @@ def duplicate_form(form_id: int, db: Session = Depends(get_db)):
         welcome_enabled=source.welcome_enabled,
         welcome_title=source.welcome_title,
         welcome_message=source.welcome_message,
+        theme=dict(source.theme) if source.theme else None,
     )
     for question in source.questions:
         question_copy = Question(

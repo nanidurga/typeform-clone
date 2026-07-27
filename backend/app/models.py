@@ -21,6 +21,7 @@ class Form(Base):
     welcome_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     welcome_title: Mapped[str | None] = mapped_column(Text, nullable=True)
     welcome_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    theme: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=_utcnow, onupdate=_utcnow, nullable=False

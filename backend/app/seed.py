@@ -71,6 +71,7 @@ def seed_if_empty(db: Session) -> None:
         status="published",
         public_id=generate_public_id(db),
         thank_you_message="You're registered! See you at DevConf 2026 🎉",
+        theme={"accent": "green", "background": "mint", "font": "serif"},
     )
     registration.questions = [
         _question("short_text", "What's your full name?", 0, required=True),
