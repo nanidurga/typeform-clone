@@ -102,7 +102,7 @@ export default function DashboardPage() {
         )}
 
         {forms && forms.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
+          <div className="rounded-xl border border-line bg-white shadow-sm">
             {forms.map((form) => (
               <FormRow
                 key={form.id}

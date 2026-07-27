@@ -65,9 +65,15 @@ export function QuestionScreen({
   return (
     <div className="w-full max-w-2xl">
       <div className="flex items-baseline gap-3">
-        <span className="flex shrink-0 items-center gap-1 text-sm text-accent">
+        <span className="flex shrink-0 items-center gap-0.5 pt-1 text-xs font-medium tracking-wide text-accent/50">
           {index + 1}
-          <span aria-hidden>→</span>
+          <svg
+            aria-hidden
+            viewBox="0 0 16 16"
+            className="h-3 w-3 fill-current"
+          >
+            <path d="M8.7 3.3a1 1 0 0 0-1.4 1.4L9.58 7H3a1 1 0 0 0 0 2h6.59l-2.3 2.3a1 1 0 1 0 1.42 1.4l4-4a1 1 0 0 0 0-1.4l-4-4Z" />
+          </svg>
         </span>
         <div className="min-w-0 flex-1">
           {editable ? (
@@ -79,7 +85,9 @@ export function QuestionScreen({
             />
           ) : (
             <h1 className="text-2xl md:text-3xl text-ink">
-              {question.title}
+              {question.title || (
+                <span className="text-neutral-300">Untitled question</span>
+              )}
               {question.required && <span className="text-accent"> *</span>}
             </h1>
           )}

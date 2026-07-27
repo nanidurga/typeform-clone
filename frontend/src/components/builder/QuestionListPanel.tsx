@@ -73,8 +73,12 @@ function QuestionRow({
           {meta.icon}
           <span className="ml-0.5">{index + 1}</span>
         </span>
-        <span className="truncate text-sm text-ink">
-          {question.title || "..."}
+        <span
+          className={`truncate text-sm ${
+            question.title ? "text-ink" : "italic text-neutral-400"
+          }`}
+        >
+          {question.title || "Untitled question"}
         </span>
       </button>
       <div className="opacity-0 transition-opacity group-hover:opacity-100">

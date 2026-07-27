@@ -49,7 +49,7 @@ export function FormRow({ form, onRename, onDelete }: FormRowProps) {
   };
 
   return (
-    <div className="group flex items-center gap-4 border-b border-line px-5 py-4 transition-colors hover:bg-bg-soft">
+    <div className="group flex items-center gap-4 border-b border-line px-5 py-4 transition-colors first:rounded-t-xl last:rounded-b-xl last:border-b-0 hover:bg-bg-soft">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent font-semibold">
         {form.title.charAt(0).toUpperCase()}
       </div>

@@ -8,17 +8,6 @@ from app.routers.forms import get_form_or_404
 
 router = APIRouter(prefix="/api", tags=["questions"])
 
-DEFAULT_TITLES: dict[str, str] = {
-    "short_text": "Your question here...",
-    "long_text": "Your question here...",
-    "multiple_choice": "Your question here...",
-    "dropdown": "Your question here...",
-    "email": "What's your email?",
-    "number": "Your question here...",
-    "yes_no": "Your question here...",
-    "rating": "How would you rate it?",
-}
-
 
 def _get_question_or_404(question_id: int, db: Session) -> Question:
     question = db.get(Question, question_id)
@@ -40,9 +29,10 @@ def add_question(
     form_id: int, payload: schemas.QuestionCreate, db: Session = Depends(get_db)
 ):
     form = get_form_or_404(form_id, db)
+    # empty default title: the builder renders it as a faint placeholder
     question = Question(
         type=payload.type,
-        title=payload.title or DEFAULT_TITLES[payload.type],
+        title=payload.title or "",
         description=payload.description,
         required=payload.required,
         position=len(form.questions),

@@ -14,7 +14,7 @@ def test_add_questions_appends_positions(client):
     q2 = _add(client, form["id"], {"type": "email"})
     assert q1["position"] == 0
     assert q2["position"] == 1
-    assert q2["title"]  # default title assigned
+    assert q2["title"] == ""  # empty default; builder shows faint placeholder
 
 
 def test_add_choice_question_with_options(client):
